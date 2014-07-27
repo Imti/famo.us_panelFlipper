@@ -1,10 +1,10 @@
 define(function(require, exports, module) {
   // Requires
-  var Engine              = require('famous/core/Engine');
-  var Surface             = require('famous/core/Surface');
-  var Modifier            = require('famous/core/Modifier');
-  var GridLayout          = require('famous/views/GridLayout');
-  var Flipper             = require('famous/views/Flipper');
+  var Engine      = require('famous/core/Engine');
+  var Surface     = require('famous/core/Surface');
+  var Modifier    = require('famous/core/Modifier');
+  var Flipper     = require('famous/views/Flipper');
+  var GridLayout  = require('famous/views/GridLayout');
 
   // create mainContext to add 
   // renderables/modifiers to
@@ -28,60 +28,66 @@ define(function(require, exports, module) {
   
   // set num of panels based on the ratio 
   var numPanels = dimensions[0] * dimensions[1];
-  var surfaces = [];
+  var arrayOfPanels = [];
 
   // Make the grid a set of surfaces
-  grid.sequenceFrom(surfaces);
+  grid.sequenceFrom(arrayOfPanels);
 
-
-  // create the individual panels to
-  // go on the grid 
+  // create the individual panels to go on the grid 
   for(var i = 0; i < numPanels; i++) {
-    createPanel(i);
+    var front = createFront(i);
+    var back = createBack(i);
+    createPanel(i, front, back);
   } 
 
-  function createPanel(panelNum) {
-    // create the front of the panel
+  // creates the front of the panel by creating a surface
+  function createFront(panelNum) {
     var panelFront = new Surface({
       properties: {
+        // creates the rainbow effect
         backgroundColor: "hsl(" + (panelNum * 360 / 10) + ", 75%, 50%)",
-        color: "#404040",
-        lineHeight: '100px',
-        textAlign: 'center'
       }
     });
-
-    // create the back of the panel
-    var panelBack = new Surface({
-      size: [undefined, undefined],
-      properties: {
-        backgroundColor: "hsl(" + (panelNum * 360 / 30) + ", 75%, 50%)",
-        color: "#404040",
-        lineHeight: '100px',
-        textAlign: 'center'
-      }
-    });   
-
-    // make a new flipper for each panel
-    // and set the front and back
-    var flipper = new Flipper();
-    flipper.setFront(panelFront);
-    flipper.setBack(panelBack);  
-
-    // flip panels
-    panelFront.on('mouseover', function() {
-      angle = Math.PI;
-      flipper.setAngle(angle, {curve : 'easeOutBounce', duration : 500});
-    });
-    panelBack.on('mouseover', function() {
-      angle = 0;
-      flipper.setAngle(angle, {curve : 'easeOutBounce', duration : 500});
-    });
-
-    // surfaces is an array of all the flippers
-    surfaces.push(flipper);
+    return panelFront;
   }
 
+  // creates the back of the panel by creating a surface
+  function createBack(panelNum) {
+    var panelBack = new Surface({
+      properties: {
+        // creates the rainbow effect
+        backgroundColor: "hsl(" + (numPanels-panelNum * 360 / 10) + ", 75%, 50%)",
+      }
+    });   
+    return panelBack;
+  }
+
+  // takes the front and back surfaces and combines them 
+  // into a panel using a flipper. Also sets the 
+  // mouseover events for both sides of the panel
+  function createPanel(panelNum, panelFront, panelBack) {
+    // make a new flipper for each panel
+    // and set the front and back
+    var panel = new Flipper();
+    panel.setFront(panelFront);
+    panel.setBack(panelBack);  
+
+    // flip panels on mouseover
+    panelFront.on('mouseover', function() {
+      angle = Math.PI;
+      panel.setAngle(angle, {curve : 'easeOutBounce', duration : 500});
+    });
+
+    panelBack.on('mouseover', function() {
+      angle = 0;
+      panel.setAngle(angle, {curve : 'easeOutBounce', duration : 500});
+    });
+
+    arrayOfPanels.push(panel);
+  }
+
+  // finally, add the center modifier
+  // and the grid to the main context
   mainContext.add(centerModifier).add(grid);
 
 });
