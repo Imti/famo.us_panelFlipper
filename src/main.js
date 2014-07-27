@@ -1,19 +1,19 @@
 define(function(require, exports, module) {
   // Requires
-  var Engine = require('famous/core/Engine');
-  var Surface = require('famous/core/Surface');
-  var Modifier = require('famous/core/Modifier');
-  var Transform = require('famous/core/Transform');
-  var HeaderFooterLayout = require('famous/views/HeaderFooterLayout');
-  var GridLayout = require('famous/views/GridLayout');
-  var Flipper    = require('famous/views/Flipper');
-  var RenderNode = require('famous/core/RenderNode');
+  var Engine              = require('famous/core/Engine');
+  var Surface             = require('famous/core/Surface');
+  var modifiers           = require('famous/core/Modifier');
+  var Transform           = require('famous/core/Transform');
+  var HeaderFooterLayout  = require('famous/views/HeaderFooterLayout');
+  var GridLayout          = require('famous/views/GridLayout');
+  var Flipper             = require('famous/views/Flipper');
+  var RenderNode          = require('famous/core/RenderNode');
 
 
   // create mainContext to add 
   // renderables/modifiers to
   var mainContext = Engine.createContext();
-  mainContext.setPerspective(500);
+  mainContext.setPerspective(1000);
 
   var dimensions = [7, 4];
 
@@ -66,14 +66,21 @@ define(function(require, exports, module) {
       flipper.setBack(panelBack);  
 
       // toggle the panels and make them flip
+      
       var toggle = false;
 
+      // flip panels
       panelFront.on('click', function() {
         console.log('click')
         var angle = toggle ? 0 : Math.PI;
         flipper.setAngle(angle, {curve : 'easeOutBounce', duration : 500});
         toggle = !toggle;
-        panelFront = (toggle === true) ? panelBack : panelFront;
+      });
+      panelBack.on('click', function() {
+        console.log('click')
+        var angle = toggle ? 0 : Math.PI;
+        flipper.setAngle(angle, {curve : 'easeOutBounce', duration : 500});
+        toggle = !toggle;
       });
 
       // surfaces is an array of all the flippers
